@@ -8,7 +8,7 @@ import pandas as pd
 from pprint import pprint
 
 # --- Robinhood Credentials -----
-username = 'manoj.shenoy'
+username = ''
 password = 'Tinumanu@1'
 rs.login(username,password)
 
