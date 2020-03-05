@@ -5,15 +5,16 @@ import alpaca_trade_api as tradeapi
 import threading
 import time, datetime
 import pandas as pd
-global data
+from pprint import pprint
+
 # --- Robinhood Credentials -----
-username = ''
-password = ''
+username = 'manoj.shenoy'
+password = 'Tinumanu@1'
 rs.login(username,password)
 
 # ----- Alpaca Credentials ------
-api_key=""
-api_secret=""
+api_key="PK5WP4G3RE0BXZCMB6HM"
+api_secret="zCJ8/9DnsKoiyn4pQWqpIsr9MyLE9IMLlHLQ6yfb"
 alpaca_api_base_url="https://paper-api.alpaca.markets"
 
 url = 'https://finance.yahoo.com/gainers'
@@ -89,7 +90,7 @@ def account_info():
     # Get account information.
     account = rs.load_account_profile()
     print('\n')
-    print(account)
+    pprint(account)
     # Check if account is restricted from trading.
     if account['deactivated']==True:
         print('Account is currently restricted from trading.')
@@ -102,18 +103,18 @@ def account_info():
 account_info()
     
 # Wait for mkt to open
-def awaitMarketOpen():
-    isOpen = tradeapi.get_clock().is_open
-    while(not isOpen):
-        clock = tradeapi.get_clock()
-        openingTime = clock.next_open.replace(tzinfo=datetime.timezone.utc).timestamp()
-        currTime = clock.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp()
-        timeToOpen = int((openingTime - currTime) / 60)
-        print(str(timeToOpen) + " minutes till market open.")
-        time.sleep(60)
-        isOpen = tradeapi.get_clock().is_open
+# def awaitMarketOpen():
+#     isOpen = tradeapi.get_clock().is_open
+#     while(not isOpen):
+#         clock = tradeapi.get_clock()
+#         openingTime = clock.next_open.replace(tzinfo=datetime.timezone.utc).timestamp()
+#         currTime = clock.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp()
+#         timeToOpen = int((openingTime - currTime) / 60)
+#         print(str(timeToOpen) + " minutes till market open.")
+#         time.sleep(60)
+#         isOpen = tradeapi.get_clock().is_open
 
-awaitMarketOpen()
+# awaitMarketOpen()
 
 # Determine position size of each asset
 def position_sizing():
@@ -122,30 +123,73 @@ def position_sizing():
     position_size=round(float(cash_balance)/no_of_stocks_to_trade)
     return position_size
 
-def determine_expirationDate():
+def get_tradable_stock_options_by_symbol():
+#     tradable=[]
+    for symbol in daily_stock_list:
+        try:
+            tradable_options = rs.options.find_tradable_options_for_stock(symbol=symbol,optionType='both')
+            
+#             print('\n List of Tradable options')
+#             pprint(tradable_options)
+#             tradable.append(tradable_options)
+        
+        except TypeError:
+            print('\nStock {} doesnt have tradable options'.format(symbol))
+    pprint(tradable_options)
+    return tradable_options
+            
+get_tradable_stock_options_by_symbol()
+
+def determine_1M_expiration_date():
+    
+    tradable_options = get_tradable_stock_options_by_symbol()
+    for i in range(len(tradable_options)):
+        for stock in daily_stock_list:
+            try:
+                if tradable_options[i]['chain_symbol'] == stock:
+#                     expiry = [stock, tradable_options[i]['expiration_date']]
+                    print('Symbol:{}, Expiry:{}'.format(stock, tradable_options[i]['expiration_date']))
+            except TypeError:
+                print('\nStock {} doesnt have tradable options'.format(stock))
+#     return expiry
+
+    
+#     for dic in tradable_options:
+#         for key in dic:
+#             print(dic[key])
+#     return test
+
+
+determine_1M_expiration_date()
+#     for symbol_id,symbol_value in tradable_options['chain_symbol'].items():
+#         print(symbol_id,symbol_value)
+        
+    
     
 
-def get_option_book(daily_stock_list):
-    rs.options.get_list_market_data(inputSymbols=daily_stock_list, expirationDate=exp)
-#     rs.options.get_option_market_data
+# def get_option_book():
+#     option_mkt_data = rs.options.get_list_market_data(inputSymbols=daily_stock_list, expirationDate=exp)
+# #     rs.options.get_option_market_data
+#     print('\n Option Market Data')
+#     pprint(option_mkt_data)
     
-    
+# get_option_book()    
 
 
 # Submit an order if quantity is above 0.
-def submitOrder(qty, stock, side, resp):
-    if(qty != 0):
-        try:
-#             tradeapi.submit_order(stock, qty, side, "market", "day")
-            rs.orders.order_buy_option_limit(positionEffect='open',price=)
-            print("Market order of | " + str(qty) + " of " + stock + " " + side + " | completed.")
-            resp.append(True)
-        except:
-            print("Order of | " + str(qty) + " of " + stock + " " + side + " | did not go through.")
-            resp.append(False)
-    else:
-        print("Quantity is 0, order of | " + str(qty) + " of " + stock + " " + side + " | not completed.")
-        resp.append(True)
+# def submitOrder(qty, stock, side, resp):
+#     if(qty != 0):
+#         try:
+# #             tradeapi.submit_order(stock, qty, side, "market", "day")
+#             rs.orders.order_buy_option_limit(positionEffect='open',price=)
+#             print("Market order of | " + str(qty) + " of " + stock + " " + side + " | completed.")
+#             resp.append(True)
+#         except:
+#             print("Order of | " + str(qty) + " of " + stock + " " + side + " | did not go through.")
+#             resp.append(False)
+#     else:
+#         print("Quantity is 0, order of | " + str(qty) + " of " + stock + " " + side + " | not completed.")
+#         resp.append(True)
 
 # Get a list of all Open positions 5 Mins before Close
 def check_Open_Positions_5m_before_close_and_exit():
@@ -168,7 +212,4 @@ def check_Open_Positions_5m_before_close_and_exit():
     except:
         if portfolio is Null:
             print ('No Open positions')
-
-# PK5WP4G3RE0BXZCMB6HM            
-# zCJ8/9DnsKoiyn4pQWqpIsr9MyLE9IMLlHLQ6yfb
-# 
+    
