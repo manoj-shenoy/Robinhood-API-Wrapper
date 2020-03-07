@@ -9,12 +9,12 @@ from pprint import pprint
 
 # --- Robinhood Credentials -----
 username = ''
-password = 'Tinumanu@1'
+password = ''
 rs.login(username,password)
 
 # ----- Alpaca Credentials ------
-api_key="PK5WP4G3RE0BXZCMB6HM"
-api_secret="zCJ8/9DnsKoiyn4pQWqpIsr9MyLE9IMLlHLQ6yfb"
+api_key=""
+api_secret=""
 alpaca_api_base_url="https://paper-api.alpaca.markets"
 
 url = 'https://finance.yahoo.com/gainers'
@@ -212,4 +212,6 @@ def check_Open_Positions_5m_before_close_and_exit():
     except:
         if portfolio is Null:
             print ('No Open positions')
-    
+
+# PK5WP4G3RE0BXZCMB6HM            
+# zCJ8/9DnsKoiyn4pQWqpIsr9MyLE9IMLlHLQ6yfb
