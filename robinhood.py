@@ -213,5 +213,4 @@ def check_Open_Positions_5m_before_close_and_exit():
         if portfolio is Null:
             print ('No Open positions')
 
-# PK5WP4G3RE0BXZCMB6HM            
-# zCJ8/9DnsKoiyn4pQWqpIsr9MyLE9IMLlHLQ6yfb
+
